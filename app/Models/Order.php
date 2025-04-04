@@ -10,7 +10,8 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        // aggiungi i campi necessari per l'ordine
+        'stato',
+        'data_vendita'
     ];
 
     /**
