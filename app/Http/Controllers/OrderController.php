@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrdersProducts;
 use Illuminate\Validation\ValidationException;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
@@ -13,7 +14,7 @@ class OrderController extends Controller
     {
         try {
             $request->validate([
-                'stato' => 'required|string|max:100',
+                'paese_destinazione' => 'required|string|max:100',
                 'data_vendita' => 'required|date',
                 'prodotti' => 'required|array',
                 'prodotti.*.product_id' => 'required|exists:products,id',
@@ -28,7 +29,7 @@ class OrderController extends Controller
         try {
             $order = Order::create([
                 'data_vendita' => $request->data_vendita,
-                'stato' => $request->stato,
+                'paese_destinazione' => $request->paese_destinazione,
             ]);
 
             foreach ($request->prodotti as $prodotto) {
@@ -55,7 +56,7 @@ class OrderController extends Controller
         if ($order) {
             try {
                 $request->validate([
-                    'stato' => 'required|string|max:100',
+                    'paese_destinazione' => 'required|string|max:100',
                     'data_vendita' => 'required|date',
                     'prodotti' => 'required|array',
                     'prodotti.*.product_id' => 'required|exists:products,id',
@@ -68,7 +69,7 @@ class OrderController extends Controller
             }
 
             try {
-                $order->update($request->only(['stato', 'data_vendita']));
+                $order->update($request->only(['paese_destinazione', 'data_vendita']));
 
                 // Rimuovi le associazioni precedenti
                 OrdersProducts::where('order_id', $order->id)->delete();
@@ -106,6 +107,28 @@ class OrderController extends Controller
             }
         } else {
             return response()->json(['message' => 'ordine non trovato'], 404);
+        }
+    }
+
+    public function co2saved()
+    {
+
+        try {
+            $orderProducts = OrdersProducts::all();
+            $totalco2 = 0;
+
+            foreach ($orderProducts as $orderProducts) {
+                $product = Product::find($orderProducts->product_id);
+
+                if ($product) {
+                    $totalco2 += $product->co2_risparmiata * $orderProducts->quantita;
+                }
+            }
+
+            return response()->json(['message' => "in totale è stata rispartmiata $totalco2 co2"]);
+        } catch (\Exception $e) {
+            // Cattura e restituisce l'errore se qualcosa va storto
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

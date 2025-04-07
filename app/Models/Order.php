@@ -10,7 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'stato',
+        'paese_destinazione',
         'data_vendita'
     ];
 
