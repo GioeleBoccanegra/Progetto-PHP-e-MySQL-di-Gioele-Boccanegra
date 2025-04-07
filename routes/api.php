@@ -15,4 +15,4 @@ Route::post('/orders', [OrderController::class, 'store']);
 Route::put('/orders/{id}', [OrderController::class, 'update']);
 Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 
-Route::get('/co2saved', [OrderController::class, 'co2saved']);
+Route::get('/co2-saved', [OrderController::class, 'co2saved']);

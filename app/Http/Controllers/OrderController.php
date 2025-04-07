@@ -110,22 +110,51 @@ class OrderController extends Controller
         }
     }
 
-    public function co2saved()
+    public function co2saved(Request $request)
     {
 
+
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $paeseDestinazione = $request->query('paese_destinazione');
+        $productId = $request->query('product_id');
+
+        //Inizializza una query sulla tabella orders_products,Unisci la tabella orders_products con la tabella orders in base all'ID dell'ordine con join e combina la tabella orders_products con la tabella products in base all'ID del prodotto.
+        $query = OrdersProducts::query()
+            ->join('orders', 'orders.id', '=', 'orders_products.order_id')
+            ->join('products', 'products.id', '=', 'orders_products.product_id');
+
+        if ($startDate) {
+            $query->where('orders.data_vendita', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->where('orders.data_vendita', '<=', $endDate);
+        }
+
+        if ($paeseDestinazione) {
+
+            $query->where('orders.paese_destinazione', '=', $paeseDestinazione);
+        }
+
+        if ($productId) {
+            $query->where('orders_products.product_id', '=', $productId);
+        }
+
         try {
-            $orderProducts = OrdersProducts::all();
-            $totalco2 = 0;
-
-            foreach ($orderProducts as $orderProducts) {
-                $product = Product::find($orderProducts->product_id);
-
+            $totalCo2Saved = $query->get()->sum(function ($orderProduct) {
+                $product = $orderProduct->product;
                 if ($product) {
-                    $totalco2 += $product->co2_risparmiata * $orderProducts->quantita;
+                    return $product->co2_risparmiata * $orderProduct->quantita;
                 }
-            }
 
-            return response()->json(['message' => "in totale è stata rispartmiata $totalco2 co2"]);
+                return 0; // Se il prodotto è null, ritorna 0
+            });
+
+
+            return response()->json([
+                'total_co2_saved' => $totalCo2Saved
+            ]);
         } catch (\Exception $e) {
             // Cattura e restituisce l'errore se qualcosa va storto
             return response()->json(['error' => $e->getMessage()], 500);
