@@ -91,4 +91,21 @@ class OrderController extends Controller
         }
         return response()->json(['message' => 'Ordine non trovato'], 404);
     }
+
+    public function destroy($id)
+    {
+        $order = Order::find($id);
+        if ($order) {
+            try {
+                $order->delete();
+
+                return response()->json(['message' => 'ordine eliminato con successo'], 200);
+            } catch (\Exception $e) {
+                // Cattura e restituisce l'errore se qualcosa va storto
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        } else {
+            return response()->json(['message' => 'ordine non trovato'], 404);
+        }
+    }
 }
