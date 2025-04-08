@@ -115,27 +115,10 @@ php artisan serve
 
 ---
 
-## 🛠 Struttura principale
 
-- `ProductController.php` → Gestione dei prodotti
-- `OrderController.php` → Gestione ordini + CO2 calcolata
-- `OrdersProducts.php` → Tabella pivot ordini-prodotti
 
----
-
-## ✅ TODO (opzionale)
-
-- [ ] Aggiungere autenticazione (es. Laravel Sanctum)
-- [ ] Scrivere test automatizzati
-- [ ] Deploy su Heroku / Render / Railway
-
----
 
 ## 📜 Licenza
 
 Questo progetto è rilasciato sotto la licenza MIT.
-
----
-
-Se vuoi che lo adatti al tuo repo GitHub o ci aggiunga immagini/logo, fammi sapere!
 
